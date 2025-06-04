@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import { CloudSun, Sun, CloudSunRain } from "lucide-react";
+import KPIDisplay from "./KPIDisplay";
 
 interface ResultsDisplayProps {
   results: {
@@ -93,9 +94,10 @@ const ResultsDisplay = ({ results }: ResultsDisplayProps) => {
         </div>
         
         <Tabs defaultValue="chart" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-2 mb-6">
+          <TabsList className="grid grid-cols-3 mb-6">
             <TabsTrigger value="chart">Daily Output Chart</TabsTrigger>
             <TabsTrigger value="daily">Daily Breakdown</TabsTrigger>
+            <TabsTrigger value="kpis">KPIs</TabsTrigger>
           </TabsList>
           
           <TabsContent value="chart" className="border-none p-0">
@@ -140,6 +142,10 @@ const ResultsDisplay = ({ results }: ResultsDisplayProps) => {
                 </div>
               ))}
             </div>
+          </TabsContent>
+
+          <TabsContent value="kpis" className="border-none p-0">
+            <KPIDisplay results={results} />
           </TabsContent>
         </Tabs>
       </CardContent>
