@@ -1,10 +1,11 @@
-
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import SolarHero from "@/components/SolarHero";
 import PredictionForm from "@/components/PredictionForm";
 import ResultsDisplay from "@/components/ResultsDisplay";
 
 const Index = () => {
+  const navigate = useNavigate();
   const [results, setResults] = useState<null | {
     dailyOutput: number[];
     totalOutput: number;
@@ -35,12 +36,17 @@ const Index = () => {
     const totalOutput = parseFloat(dailyOutput.reduce((sum, val) => sum + val, 0).toFixed(2));
     const efficiency = parseFloat((efficiencyFactor * directionMultiplier * 100).toFixed(1));
     
-    setResults({
+    const newResults = {
       dailyOutput,
       totalOutput,
       efficiency,
       weatherConditions
-    });
+    };
+    
+    setResults(newResults);
+    
+    // Navigate to metrics page with results
+    navigate('/metrics', { state: { results: newResults } });
   };
 
   return (
