@@ -8,6 +8,7 @@ interface KPIDisplayProps {
     totalOutput: number;
     efficiency: number;
     weatherConditions: string[];
+    duration: string;
   } | null;
 }
 
@@ -42,7 +43,7 @@ const KPIDisplay = ({ results }: KPIDisplayProps) => {
   const technicalAvailability = 99.2; // % (simulated)
 
   const kpis = [
-    { title: "Total Yield", value: `${totalYield} kWh`, unit: "Weekly", color: "bg-green-50 text-green-700", icon: <Gauge className="h-5 w-5" /> },
+    { title: "Total Yield", value: `${totalYield} kWh`, unit: results.duration, color: "bg-green-50 text-green-700", icon: <Gauge className="h-5 w-5" /> },
     { title: "Performance Ratio", value: `${performanceRatio}%`, unit: "Efficiency", color: "bg-blue-50 text-blue-700", icon: <CirclePercent className="h-5 w-5" /> },
     { title: "Insolation (Sky Facing)", value: `${insolation} kWh/m²`, unit: "Daily", color: "bg-yellow-50 text-yellow-700", icon: <Gauge className="h-5 w-5" /> },
     { title: "Irradiance (Sky Facing)", value: `${irradiance} W/m²`, unit: "Current", color: "bg-orange-50 text-orange-700", icon: <Gauge className="h-5 w-5" /> },
@@ -58,9 +59,9 @@ const KPIDisplay = ({ results }: KPIDisplayProps) => {
   return (
     <Card className="shadow-lg border-blue-100">
       <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100/50 rounded-t-lg">
-        <CardTitle>Solar Power KPIs</CardTitle>
+        <CardTitle>Solar Power KPIs - {results.duration}</CardTitle>
         <CardDescription>
-          Key Performance Indicators for your solar power system
+          Key Performance Indicators for your solar power system over {results.duration.toLowerCase()}
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-6">
@@ -80,7 +81,7 @@ const KPIDisplay = ({ results }: KPIDisplayProps) => {
         </div>
         
         <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-          <h4 className="font-semibold text-gray-700 mb-2">Performance Summary</h4>
+          <h4 className="font-semibold text-gray-700 mb-2">Performance Summary - {results.duration}</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <div>
               <span className="font-medium">System Status:</span>

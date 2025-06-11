@@ -33,8 +33,8 @@ const Metrics = () => {
               Back to Prediction
             </Button>
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Solar Power Metrics</h1>
-          <p className="text-gray-600">View simulated predictions and fetch real-time data from your API</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Solar Power Metrics - {results.duration}</h1>
+          <p className="text-gray-600">View simulated predictions and fetch real-time data from your API for {results.duration.toLowerCase()}</p>
         </div>
         
         <Tabs defaultValue="simulated" className="space-y-4">
