@@ -1,6 +1,8 @@
 
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { LayoutDashboard } from "lucide-react";
 import SolarHero from "@/components/SolarHero";
 import PredictionForm from "@/components/PredictionForm";
 import ResultsDisplay from "@/components/ResultsDisplay";
@@ -123,6 +125,14 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       <SolarHero />
       <div className="container mx-auto px-4 py-8 md:py-16">
+        <div className="mb-6 text-center">
+          <Link to="/dashboard">
+            <Button className="mb-4">
+              <LayoutDashboard className="h-4 w-4 mr-2" />
+              Open Dashboard
+            </Button>
+          </Link>
+        </div>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div className="lg:col-span-5">
             <PredictionForm 
