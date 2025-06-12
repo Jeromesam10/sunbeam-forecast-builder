@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ import PredictionForm from "@/components/PredictionForm";
 import ResultsDisplay from "@/components/ResultsDisplay";
 import KPIDisplay from "@/components/KPIDisplay";
 import ProjectMap from "@/components/ProjectMap";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Sidebar,
   SidebarContent,
@@ -111,68 +113,72 @@ const Dashboard = () => {
       case "prediction":
         return (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
-            <div className="lg:col-span-4 space-y-4">
-              <PredictionForm 
-                onSubmit={handlePrediction} 
-                selectedDuration={selectedDuration}
-                onDurationChange={setSelectedDuration}
-              />
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-sm font-medium">Duration Selection</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <Select value={durationType} onValueChange={(value: "preset" | "custom") => setDurationType(value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select duration type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="preset">Preset Duration</SelectItem>
-                      <SelectItem value="custom">Custom Date Range</SelectItem>
-                    </SelectContent>
-                  </Select>
+            <div className="lg:col-span-4">
+              <ScrollArea className="h-full">
+                <div className="space-y-4 pr-4">
+                  <PredictionForm 
+                    onSubmit={handlePrediction} 
+                    selectedDuration={selectedDuration}
+                    onDurationChange={setSelectedDuration}
+                  />
                   
-                  {durationType === "custom" && (
-                    <div className="space-y-2">
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className={cn(
-                              "w-full justify-start text-left font-normal",
-                              !dateRange?.from && "text-muted-foreground"
-                            )}
-                          >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {dateRange?.from ? (
-                              dateRange.to ? (
-                                <>
-                                  {format(dateRange.from, "LLL dd, y")} -{" "}
-                                  {format(dateRange.to, "LLL dd, y")}
-                                </>
-                              ) : (
-                                format(dateRange.from, "LLL dd, y")
-                              )
-                            ) : (
-                              <span>Pick a date range</span>
-                            )}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="range"
-                            selected={dateRange}
-                            onSelect={setDateRange}
-                            numberOfMonths={2}
-                            className="pointer-events-auto"
-                          />
-                        </PopoverContent>
-                      </Popover>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-sm font-medium">Duration Selection</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <Select value={durationType} onValueChange={(value: "preset" | "custom") => setDurationType(value)}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select duration type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="preset">Preset Duration</SelectItem>
+                          <SelectItem value="custom">Custom Date Range</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      
+                      {durationType === "custom" && (
+                        <div className="space-y-2">
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant="outline"
+                                className={cn(
+                                  "w-full justify-start text-left font-normal",
+                                  !dateRange?.from && "text-muted-foreground"
+                                )}
+                              >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {dateRange?.from ? (
+                                  dateRange.to ? (
+                                    <>
+                                      {format(dateRange.from, "LLL dd, y")} -{" "}
+                                      {format(dateRange.to, "LLL dd, y")}
+                                    </>
+                                  ) : (
+                                    format(dateRange.from, "LLL dd, y")
+                                  )
+                                ) : (
+                                  <span>Pick a date range</span>
+                                )}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                              <Calendar
+                                mode="range"
+                                selected={dateRange}
+                                onSelect={setDateRange}
+                                numberOfMonths={2}
+                                className="pointer-events-auto"
+                              />
+                            </PopoverContent>
+                          </Popover>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+              </ScrollArea>
             </div>
             
             <div className="lg:col-span-8 h-full">
@@ -238,7 +244,7 @@ const Dashboard = () => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-gradient-to-b from-blue-50 to-white">
+      <div className="h-screen flex w-full bg-gradient-to-b from-blue-50 to-white overflow-hidden">
         <Sidebar>
           <SidebarContent>
             <SidebarGroup>
@@ -266,7 +272,7 @@ const Dashboard = () => {
         </Sidebar>
         
         <div className="flex-1 flex flex-col overflow-hidden">
-          <div className="p-4 border-b bg-white/50 backdrop-blur-sm">
+          <div className="p-4 border-b bg-white/50 backdrop-blur-sm flex-shrink-0">
             <div className="flex items-center gap-4">
               <SidebarTrigger />
               <h1 className="text-2xl font-bold">

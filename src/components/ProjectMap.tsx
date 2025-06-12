@@ -1,13 +1,27 @@
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { MapPin, Zap, TrendingUp, Calendar } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+
+// Define the mapbox types we need
+declare global {
+  interface Window {
+    mapboxgl: any;
+  }
+}
 
 const ProjectMap = () => {
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
+  const [mapboxToken, setMapboxToken] = useState("");
+  const [showTokenInput, setShowTokenInput] = useState(true);
+  const mapContainer = useRef<HTMLDivElement>(null);
+  const map = useRef<any>(null);
 
-  // Mock project data
+  // Real project data with actual coordinates
   const projects = [
     {
       id: "1",
@@ -68,6 +82,105 @@ const ProjectMap = () => {
     }
   };
 
+  const initializeMap = () => {
+    if (!mapContainer.current || !mapboxToken || map.current) return;
+
+    // Load Mapbox GL JS dynamically
+    const script = document.createElement('script');
+    script.src = 'https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js';
+    script.onload = () => {
+      const link = document.createElement('link');
+      link.href = 'https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css';
+      link.rel = 'stylesheet';
+      document.head.appendChild(link);
+
+      // Initialize map
+      window.mapboxgl.accessToken = mapboxToken;
+      
+      map.current = new window.mapboxgl.Map({
+        container: mapContainer.current,
+        style: 'mapbox://styles/mapbox/light-v11',
+        center: [-104.9903, 38.0], // Center on US
+        zoom: 4
+      });
+
+      // Add navigation controls
+      map.current.addControl(new window.mapboxgl.NavigationControl());
+
+      // Add markers for each project
+      projects.forEach((project) => {
+        const markerColor = project.status === "Active" ? "#22c55e" : 
+                           project.status === "Maintenance" ? "#eab308" : "#ef4444";
+
+        const marker = new window.mapboxgl.Marker({ color: markerColor })
+          .setLngLat([project.coordinates.lng, project.coordinates.lat])
+          .setPopup(
+            new window.mapboxgl.Popup({ offset: 25 })
+              .setHTML(`
+                <div class="p-2">
+                  <h3 class="font-semibold text-sm">${project.name}</h3>
+                  <p class="text-xs text-gray-600">${project.location}</p>
+                  <p class="text-xs"><strong>Capacity:</strong> ${project.capacity}</p>
+                  <p class="text-xs"><strong>Status:</strong> ${project.status}</p>
+                  <p class="text-xs"><strong>Efficiency:</strong> ${project.efficiency}</p>
+                </div>
+              `)
+          )
+          .addTo(map.current);
+
+        // Add click event to marker
+        marker.getElement().addEventListener('click', () => {
+          setSelectedProject(project.id);
+        });
+      });
+    };
+    document.head.appendChild(script);
+  };
+
+  const handleTokenSubmit = () => {
+    if (mapboxToken.trim()) {
+      setShowTokenInput(false);
+      setTimeout(() => {
+        initializeMap();
+      }, 100);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (map.current) {
+        map.current.remove();
+      }
+    };
+  }, []);
+
+  if (showTokenInput) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle>Mapbox Configuration</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              To display the interactive map, please enter your Mapbox public token. 
+              You can get one from <a href="https://mapbox.com/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">mapbox.com</a>
+            </p>
+            <Input
+              type="text"
+              placeholder="Enter your Mapbox public token"
+              value={mapboxToken}
+              onChange={(e) => setMapboxToken(e.target.value)}
+            />
+            <Button onClick={handleTokenSubmit} className="w-full">
+              Initialize Map
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
       {/* Project List */}
@@ -79,88 +192,47 @@ const ProjectMap = () => {
               Project Locations
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3 max-h-96 overflow-y-auto">
-            {projects.map((project) => (
-              <div
-                key={project.id}
-                className={`p-3 rounded-lg border cursor-pointer transition-colors ${
-                  selectedProject === project.id
-                    ? "border-blue-500 bg-blue-50"
-                    : "border-gray-200 hover:border-gray-300"
-                }`}
-                onClick={() => setSelectedProject(project.id)}
-              >
-                <div className="flex items-start justify-between mb-2">
-                  <h4 className="font-medium text-sm">{project.name}</h4>
-                  <Badge className={getStatusColor(project.status)}>
-                    {project.status}
-                  </Badge>
-                </div>
-                <p className="text-xs text-gray-600 mb-2">{project.location}</p>
-                <div className="flex justify-between text-xs">
-                  <span className="text-gray-500">Capacity: {project.capacity}</span>
-                  <span className="text-green-600 font-medium">{project.efficiency}</span>
-                </div>
+          <CardContent>
+            <ScrollArea className="h-80">
+              <div className="space-y-3 pr-4">
+                {projects.map((project) => (
+                  <div
+                    key={project.id}
+                    className={`p-3 rounded-lg border cursor-pointer transition-colors ${
+                      selectedProject === project.id
+                        ? "border-blue-500 bg-blue-50"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                    onClick={() => setSelectedProject(project.id)}
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <h4 className="font-medium text-sm">{project.name}</h4>
+                      <Badge className={getStatusColor(project.status)}>
+                        {project.status}
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-gray-600 mb-2">{project.location}</p>
+                    <div className="flex justify-between text-xs">
+                      <span className="text-gray-500">Capacity: {project.capacity}</span>
+                      <span className="text-green-600 font-medium">{project.efficiency}</span>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
+            </ScrollArea>
           </CardContent>
         </Card>
       </div>
 
-      {/* Map Visualization */}
+      {/* Map and Project Details */}
       <div className="lg:col-span-2 space-y-4">
+        {/* Interactive Map */}
         <Card className="h-96">
           <CardHeader>
             <CardTitle>Geographic Distribution</CardTitle>
           </CardHeader>
-          <CardContent className="h-full">
-            <div className="relative w-full h-64 bg-gradient-to-br from-blue-100 to-green-100 rounded-lg overflow-hidden">
-              {/* Simple map visualization */}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-200 via-green-100 to-yellow-100 opacity-50"></div>
-              
-              {/* Project markers */}
-              {projects.map((project, index) => (
-                <div
-                  key={project.id}
-                  className={`absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer ${
-                    selectedProject === project.id ? "z-10" : "z-0"
-                  }`}
-                  style={{
-                    left: `${20 + (index * 20)}%`,
-                    top: `${30 + (index * 15)}%`,
-                  }}
-                  onClick={() => setSelectedProject(project.id)}
-                >
-                  <div
-                    className={`w-4 h-4 rounded-full border-2 border-white shadow-lg ${
-                      project.status === "Active"
-                        ? "bg-green-500"
-                        : project.status === "Maintenance"
-                        ? "bg-yellow-500"
-                        : "bg-red-500"
-                    } ${selectedProject === project.id ? "scale-150" : "scale-100"} transition-transform`}
-                  ></div>
-                  {selectedProject === project.id && (
-                    <div className="absolute top-6 left-1/2 transform -translate-x-1/2 bg-white p-2 rounded shadow-lg border min-w-max">
-                      <p className="text-xs font-medium">{project.name}</p>
-                      <p className="text-xs text-gray-600">{project.location}</p>
-                    </div>
-                  )}
-                </div>
-              ))}
-              
-              {/* Map grid overlay */}
-              <div className="absolute inset-0 opacity-20">
-                <svg className="w-full h-full">
-                  <defs>
-                    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#94a3b8" strokeWidth="1"/>
-                    </pattern>
-                  </defs>
-                  <rect width="100%" height="100%" fill="url(#grid)" />
-                </svg>
-              </div>
-            </div>
+          <CardContent className="h-full p-0">
+            <div ref={mapContainer} className="w-full h-full rounded-b-lg" />
           </CardContent>
         </Card>
 
