@@ -2,24 +2,21 @@
 import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { MapPin, Zap, TrendingUp, Calendar } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-// Define the mapbox types we need
+// Define the Leaflet types we need
 declare global {
   interface Window {
-    mapboxgl: any;
+    L: any;
   }
 }
 
 const ProjectMap = () => {
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
-  const [mapboxToken, setMapboxToken] = useState("");
-  const [showTokenInput, setShowTokenInput] = useState(true);
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<any>(null);
+  const markersRef = useRef<any[]>([]);
 
   // Real project data with actual coordinates
   const projects = [
@@ -83,135 +80,111 @@ const ProjectMap = () => {
   };
 
   const initializeMap = () => {
-    if (!mapContainer.current || !mapboxToken || map.current) return;
+    if (!mapContainer.current || map.current) return;
 
-    // Load Mapbox GL JS dynamically
+    // Load Leaflet CSS and JS
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+    document.head.appendChild(link);
+
     const script = document.createElement('script');
-    script.src = 'https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js';
+    script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
     script.onload = () => {
-      const link = document.createElement('link');
-      link.href = 'https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css';
-      link.rel = 'stylesheet';
-      document.head.appendChild(link);
+      // Initialize map with OpenStreetMap
+      map.current = window.L.map(mapContainer.current).setView([38.0, -104.9903], 5);
 
-      // Initialize map
-      window.mapboxgl.accessToken = mapboxToken;
-      
-      map.current = new window.mapboxgl.Map({
-        container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/light-v11',
-        center: [-104.9903, 38.0], // Center on US
-        zoom: 4
-      });
-
-      // Add navigation controls
-      map.current.addControl(new window.mapboxgl.NavigationControl());
+      // Add OpenStreetMap tile layer (completely free)
+      window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 19
+      }).addTo(map.current);
 
       // Add markers for each project
       projects.forEach((project) => {
-        const markerColor = project.status === "Active" ? "#22c55e" : 
-                           project.status === "Maintenance" ? "#eab308" : "#ef4444";
+        const markerColor = project.status === "Active" ? "green" : 
+                           project.status === "Maintenance" ? "orange" : "red";
 
-        const marker = new window.mapboxgl.Marker({ color: markerColor })
-          .setLngLat([project.coordinates.lng, project.coordinates.lat])
-          .setPopup(
-            new window.mapboxgl.Popup({ offset: 25 })
-              .setHTML(`
-                <div class="p-2">
-                  <h3 class="font-semibold text-sm">${project.name}</h3>
-                  <p class="text-xs text-gray-600">${project.location}</p>
-                  <p class="text-xs"><strong>Capacity:</strong> ${project.capacity}</p>
-                  <p class="text-xs"><strong>Status:</strong> ${project.status}</p>
-                  <p class="text-xs"><strong>Efficiency:</strong> ${project.efficiency}</p>
-                </div>
-              `)
-          )
-          .addTo(map.current);
+        // Create custom icon based on status
+        const customIcon = window.L.divIcon({
+          html: `<div style="background-color: ${markerColor}; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>`,
+          className: 'custom-div-icon',
+          iconSize: [20, 20],
+          iconAnchor: [10, 10]
+        });
+
+        const marker = window.L.marker([project.coordinates.lat, project.coordinates.lng], {
+          icon: customIcon
+        }).addTo(map.current);
+
+        // Add popup
+        marker.bindPopup(`
+          <div class="p-2">
+            <h3 class="font-semibold text-sm">${project.name}</h3>
+            <p class="text-xs text-gray-600">${project.location}</p>
+            <p class="text-xs"><strong>Capacity:</strong> ${project.capacity}</p>
+            <p class="text-xs"><strong>Status:</strong> ${project.status}</p>
+            <p class="text-xs"><strong>Efficiency:</strong> ${project.efficiency}</p>
+          </div>
+        `);
 
         // Add click event to marker
-        marker.getElement().addEventListener('click', () => {
+        marker.on('click', () => {
           setSelectedProject(project.id);
         });
+
+        markersRef.current.push(marker);
       });
     };
     document.head.appendChild(script);
   };
 
-  const handleTokenSubmit = () => {
-    if (mapboxToken.trim()) {
-      setShowTokenInput(false);
-      setTimeout(() => {
-        initializeMap();
-      }, 100);
-    }
-  };
-
   useEffect(() => {
+    const timer = setTimeout(() => {
+      initializeMap();
+    }, 100);
+
     return () => {
+      clearTimeout(timer);
       if (map.current) {
         map.current.remove();
+        map.current = null;
       }
+      markersRef.current = [];
     };
   }, []);
 
-  if (showTokenInput) {
-    return (
-      <div className="h-full flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle>Mapbox Configuration</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              To display the interactive map, please enter your Mapbox public token. 
-              You can get one from <a href="https://mapbox.com/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">mapbox.com</a>
-            </p>
-            <Input
-              type="text"
-              placeholder="Enter your Mapbox public token"
-              value={mapboxToken}
-              onChange={(e) => setMapboxToken(e.target.value)}
-            />
-            <Button onClick={handleTokenSubmit} className="w-full">
-              Initialize Map
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-full">
       {/* Project List */}
-      <div className="space-y-4">
+      <div className="space-y-3">
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MapPin className="h-5 w-5" />
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <MapPin className="h-4 w-4" />
               Project Locations
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ScrollArea className="h-80">
-              <div className="space-y-3 pr-4">
+            <ScrollArea className="h-64">
+              <div className="space-y-2 pr-4">
                 {projects.map((project) => (
                   <div
                     key={project.id}
-                    className={`p-3 rounded-lg border cursor-pointer transition-colors ${
+                    className={`p-2 rounded-lg border cursor-pointer transition-colors ${
                       selectedProject === project.id
                         ? "border-blue-500 bg-blue-50"
                         : "border-gray-200 hover:border-gray-300"
                     }`}
                     onClick={() => setSelectedProject(project.id)}
                   >
-                    <div className="flex items-start justify-between mb-2">
-                      <h4 className="font-medium text-sm">{project.name}</h4>
-                      <Badge className={getStatusColor(project.status)}>
+                    <div className="flex items-start justify-between mb-1">
+                      <h4 className="font-medium text-xs">{project.name}</h4>
+                      <Badge className={`${getStatusColor(project.status)} text-xs px-1 py-0`}>
                         {project.status}
                       </Badge>
                     </div>
-                    <p className="text-xs text-gray-600 mb-2">{project.location}</p>
+                    <p className="text-xs text-gray-600 mb-1">{project.location}</p>
                     <div className="flex justify-between text-xs">
                       <span className="text-gray-500">Capacity: {project.capacity}</span>
                       <span className="text-green-600 font-medium">{project.efficiency}</span>
@@ -225,11 +198,11 @@ const ProjectMap = () => {
       </div>
 
       {/* Map and Project Details */}
-      <div className="lg:col-span-2 space-y-4">
+      <div className="lg:col-span-2 space-y-3">
         {/* Interactive Map */}
-        <Card className="h-96">
-          <CardHeader>
-            <CardTitle>Geographic Distribution</CardTitle>
+        <Card className="h-80">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">Geographic Distribution</CardTitle>
           </CardHeader>
           <CardContent className="h-full p-0">
             <div ref={mapContainer} className="w-full h-full rounded-b-lg" />
@@ -239,8 +212,8 @@ const ProjectMap = () => {
         {/* Project Details */}
         {selectedProject && (
           <Card>
-            <CardHeader>
-              <CardTitle>Project Details</CardTitle>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base">Project Details</CardTitle>
             </CardHeader>
             <CardContent>
               {(() => {
@@ -248,38 +221,38 @@ const ProjectMap = () => {
                 if (!project) return null;
                 
                 return (
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-2">
                       <div className="flex items-center gap-2">
-                        <Zap className="h-4 w-4 text-blue-500" />
+                        <Zap className="h-3 w-3 text-blue-500" />
                         <div>
-                          <p className="text-sm font-medium">Capacity</p>
+                          <p className="text-xs font-medium">Capacity</p>
                           <p className="text-xs text-gray-600">{project.capacity}</p>
                         </div>
                       </div>
                       
                       <div className="flex items-center gap-2">
-                        <TrendingUp className="h-4 w-4 text-green-500" />
+                        <TrendingUp className="h-3 w-3 text-green-500" />
                         <div>
-                          <p className="text-sm font-medium">Efficiency</p>
+                          <p className="text-xs font-medium">Efficiency</p>
                           <p className="text-xs text-gray-600">{project.efficiency}</p>
                         </div>
                       </div>
                     </div>
                     
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       <div className="flex items-center gap-2">
-                        <Zap className="h-4 w-4 text-orange-500" />
+                        <Zap className="h-3 w-3 text-orange-500" />
                         <div>
-                          <p className="text-sm font-medium">Monthly Output</p>
+                          <p className="text-xs font-medium">Monthly Output</p>
                           <p className="text-xs text-gray-600">{project.monthlyOutput}</p>
                         </div>
                       </div>
                       
                       <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4 text-purple-500" />
+                        <Calendar className="h-3 w-3 text-purple-500" />
                         <div>
-                          <p className="text-sm font-medium">Last Maintenance</p>
+                          <p className="text-xs font-medium">Last Maintenance</p>
                           <p className="text-xs text-gray-600">{project.lastMaintenance}</p>
                         </div>
                       </div>

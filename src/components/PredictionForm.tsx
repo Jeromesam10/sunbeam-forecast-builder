@@ -36,21 +36,21 @@ const PredictionForm = ({ onSubmit, selectedDuration, onDurationChange }: Predic
 
   return (
     <Card className="shadow-lg border-blue-100">
-      <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100/50 rounded-t-lg">
-        <CardTitle className="flex items-center">
-          <Zap className="h-5 w-5 mr-2 text-yellow-500" />
+      <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100/50 rounded-t-lg pb-3">
+        <CardTitle className="flex items-center text-lg">
+          <Zap className="h-4 w-4 mr-2 text-yellow-500" />
           Solar Power Prediction
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-xs">
           Enter your solar panel specifications to get power generation estimates
         </CardDescription>
       </CardHeader>
-      <CardContent className="pt-6">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="duration">Prediction Duration</Label>
+      <CardContent className="pt-4 space-y-3">
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <div className="space-y-1">
+            <Label htmlFor="duration" className="text-xs font-medium">Prediction Duration</Label>
             <Select value={selectedDuration} onValueChange={onDurationChange}>
-              <SelectTrigger>
+              <SelectTrigger className="h-8 text-xs">
                 <SelectValue placeholder="Select duration" />
               </SelectTrigger>
               <SelectContent>
@@ -62,9 +62,9 @@ const PredictionForm = ({ onSubmit, selectedDuration, onDurationChange }: Predic
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="location" className="flex items-center">
-              <MapPin className="h-4 w-4 mr-1" />
+          <div className="space-y-1">
+            <Label htmlFor="location" className="flex items-center text-xs font-medium">
+              <MapPin className="h-3 w-3 mr-1" />
               Location
             </Label>
             <Input
@@ -72,12 +72,12 @@ const PredictionForm = ({ onSubmit, selectedDuration, onDurationChange }: Predic
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               placeholder="Enter your location"
-              className="focus:border-blue-300"
+              className="focus:border-blue-300 h-8 text-xs"
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="capacity">Panel Capacity (kW)</Label>
+          <div className="space-y-1">
+            <Label htmlFor="capacity" className="text-xs font-medium">Panel Capacity (kW)</Label>
             <Input
               id="capacity"
               type="number"
@@ -85,12 +85,12 @@ const PredictionForm = ({ onSubmit, selectedDuration, onDurationChange }: Predic
               step="0.1"
               value={capacity}
               onChange={(e) => setCapacity(parseFloat(e.target.value))}
-              className="focus:border-blue-300"
+              className="focus:border-blue-300 h-8 text-xs"
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="angle">Tilt Angle (degrees)</Label>
+          <div className="space-y-1">
+            <Label htmlFor="angle" className="text-xs font-medium">Tilt Angle (degrees)</Label>
             <Input
               id="angle"
               type="number"
@@ -98,14 +98,14 @@ const PredictionForm = ({ onSubmit, selectedDuration, onDurationChange }: Predic
               max="90"
               value={angle}
               onChange={(e) => setAngle(parseInt(e.target.value))}
-              className="focus:border-blue-300"
+              className="focus:border-blue-300 h-8 text-xs"
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="direction">Panel Direction</Label>
+          <div className="space-y-1">
+            <Label htmlFor="direction" className="text-xs font-medium">Panel Direction</Label>
             <Select value={direction} onValueChange={setDirection}>
-              <SelectTrigger>
+              <SelectTrigger className="h-8 text-xs">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -117,7 +117,7 @@ const PredictionForm = ({ onSubmit, selectedDuration, onDurationChange }: Predic
             </Select>
           </div>
 
-          <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">
+          <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 h-8 text-xs">
             Generate Prediction
           </Button>
         </form>
