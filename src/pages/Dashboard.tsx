@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
@@ -9,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { CalendarIcon, MapPin, BarChart3, Activity, Settings, Home } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format, differenceInDays } from "date-fns";
+import { DateRange } from "react-day-picker";
 import PredictionForm from "@/components/PredictionForm";
 import ResultsDisplay from "@/components/ResultsDisplay";
 import KPIDisplay from "@/components/KPIDisplay";
@@ -37,10 +37,7 @@ const Dashboard = () => {
   const [showKPIs, setShowKPIs] = useState(false);
   const [selectedDuration, setSelectedDuration] = useState("1 week");
   const [activeView, setActiveView] = useState("prediction");
-  const [dateRange, setDateRange] = useState<{from: Date | undefined; to: Date | undefined}>({
-    from: undefined,
-    to: undefined
-  });
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [durationType, setDurationType] = useState<"preset" | "custom">("preset");
 
   const sidebarItems = [
@@ -59,7 +56,7 @@ const Dashboard = () => {
   }) => {
     // Calculate duration based on selection
     let finalDuration = selectedDuration;
-    if (durationType === "custom" && dateRange.from && dateRange.to) {
+    if (durationType === "custom" && dateRange?.from && dateRange?.to) {
       const days = differenceInDays(dateRange.to, dateRange.from);
       finalDuration = `${days} days`;
     }
@@ -144,11 +141,11 @@ const Dashboard = () => {
                             variant="outline"
                             className={cn(
                               "w-full justify-start text-left font-normal",
-                              !dateRange.from && "text-muted-foreground"
+                              !dateRange?.from && "text-muted-foreground"
                             )}
                           >
                             <CalendarIcon className="mr-2 h-4 w-4" />
-                            {dateRange.from ? (
+                            {dateRange?.from ? (
                               dateRange.to ? (
                                 <>
                                   {format(dateRange.from, "LLL dd, y")} -{" "}
@@ -166,7 +163,7 @@ const Dashboard = () => {
                           <Calendar
                             mode="range"
                             selected={dateRange}
-                            onSelect={(range) => setDateRange(range || {from: undefined, to: undefined})}
+                            onSelect={setDateRange}
                             numberOfMonths={2}
                             className="pointer-events-auto"
                           />
