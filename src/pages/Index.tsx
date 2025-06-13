@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
@@ -111,7 +110,7 @@ const Index = () => {
     switch (activeView) {
       case "prediction":
         return (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 h-full">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 h-full">
             <div className="lg:col-span-4 space-y-2">
               <PredictionForm 
                 onSubmit={handlePrediction} 
@@ -119,13 +118,13 @@ const Index = () => {
                 onDurationChange={setSelectedDuration}
               />
               
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium">Duration Selection</CardTitle>
+              <Card className="text-xs">
+                <CardHeader className="pb-1 pt-2 px-3">
+                  <CardTitle className="text-xs font-medium">Duration Selection</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-2">
+                <CardContent className="space-y-2 p-3 pt-1">
                   <Select value={durationType} onValueChange={(value: "preset" | "custom") => setDurationType(value)}>
-                    <SelectTrigger className="h-7 text-xs">
+                    <SelectTrigger className="h-6 text-xs">
                       <SelectValue placeholder="Select duration type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -141,22 +140,22 @@ const Index = () => {
                           <Button
                             variant="outline"
                             className={cn(
-                              "w-full justify-start text-left font-normal h-7 text-xs",
+                              "w-full justify-start text-left font-normal h-6 text-xs px-2",
                               !dateRange?.from && "text-muted-foreground"
                             )}
                           >
-                            <CalendarIcon className="mr-2 h-3 w-3" />
+                            <CalendarIcon className="mr-1 h-3 w-3" />
                             {dateRange?.from ? (
                               dateRange.to ? (
                                 <>
-                                  {format(dateRange.from, "LLL dd, y")} -{" "}
-                                  {format(dateRange.to, "LLL dd, y")}
+                                  {format(dateRange.from, "MMM dd")} -{" "}
+                                  {format(dateRange.to, "MMM dd")}
                                 </>
                               ) : (
-                                format(dateRange.from, "LLL dd, y")
+                                format(dateRange.from, "MMM dd, y")
                               )
                             ) : (
-                              <span>Pick a date range</span>
+                              <span>Pick date range</span>
                             )}
                           </Button>
                         </PopoverTrigger>
@@ -196,9 +195,9 @@ const Index = () => {
             ) : (
               <Card className="h-full flex items-center justify-center">
                 <CardContent className="text-center">
-                  <h3 className="text-lg font-medium mb-2">No Analytics Data</h3>
-                  <p className="text-muted-foreground mb-4">Generate a prediction first to view analytics</p>
-                  <Button onClick={() => setActiveView("prediction")}>Go to Prediction</Button>
+                  <h3 className="text-base font-medium mb-2">No Analytics Data</h3>
+                  <p className="text-muted-foreground mb-4 text-sm">Generate a prediction first to view analytics</p>
+                  <Button onClick={() => setActiveView("prediction")} className="text-xs h-8">Go to Prediction</Button>
                 </CardContent>
               </Card>
             )}
@@ -211,11 +210,11 @@ const Index = () => {
       case "monitoring":
         return (
           <Card className="h-full">
-            <CardHeader>
-              <CardTitle>Live Monitoring</CardTitle>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base">Live Monitoring</CardTitle>
             </CardHeader>
             <CardContent className="flex items-center justify-center h-full">
-              <p className="text-muted-foreground">Live monitoring dashboard coming soon...</p>
+              <p className="text-muted-foreground text-sm">Live monitoring dashboard coming soon...</p>
             </CardContent>
           </Card>
         );
@@ -223,11 +222,11 @@ const Index = () => {
       case "settings":
         return (
           <Card className="h-full">
-            <CardHeader>
-              <CardTitle>Settings</CardTitle>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base">Settings</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground">Application settings will be available here.</p>
+              <p className="text-muted-foreground text-sm">Application settings will be available here.</p>
             </CardContent>
           </Card>
         );
@@ -240,10 +239,10 @@ const Index = () => {
   return (
     <SidebarProvider>
       <div className="h-screen flex w-full bg-gradient-to-b from-blue-50 to-white">
-        <Sidebar>
+        <Sidebar className="text-xs">
           <SidebarContent>
             <SidebarGroup>
-              <SidebarGroupLabel>Solar Dashboard</SidebarGroupLabel>
+              <SidebarGroupLabel className="text-xs">Solar Dashboard</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
                   {sidebarItems.map((item) => (
@@ -252,9 +251,10 @@ const Index = () => {
                         asChild
                         isActive={activeView === item.id}
                         onClick={() => setActiveView(item.id)}
+                        className="text-xs h-8"
                       >
                         <div className="cursor-pointer">
-                          <item.icon className="h-4 w-4" />
+                          <item.icon className="h-3 w-3" />
                           <span>{item.title}</span>
                         </div>
                       </SidebarMenuButton>
@@ -267,19 +267,25 @@ const Index = () => {
         </Sidebar>
         
         <div className="flex-1 flex flex-col">
-          <div className="p-2 border-b bg-white/50 backdrop-blur-sm flex-shrink-0">
-            <div className="flex items-center gap-4">
-              <SidebarTrigger />
-              <div className="flex items-center gap-2">
-                <Zap className="h-5 w-5 text-yellow-500" />
-                <h1 className="text-lg font-bold">
-                  Solar Dashboard - {sidebarItems.find(item => item.id === activeView)?.title}
-                </h1>
+          {/* Dashboard Header */}
+          <div className="p-2 border-b bg-white shadow-sm flex-shrink-0">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <SidebarTrigger className="h-6 w-6" />
+                <div className="flex items-center gap-2">
+                  <Zap className="h-5 w-5 text-yellow-500" />
+                  <h1 className="text-lg font-bold text-gray-800">
+                    Solar Power Prediction Dashboard
+                  </h1>
+                </div>
+              </div>
+              <div className="text-xs text-gray-500">
+                {sidebarItems.find(item => item.id === activeView)?.title}
               </div>
             </div>
           </div>
           
-          <div className="flex-1 p-3 overflow-hidden">
+          <div className="flex-1 p-2 overflow-hidden">
             {renderContent()}
           </div>
         </div>
