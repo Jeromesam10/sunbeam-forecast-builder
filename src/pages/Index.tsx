@@ -110,8 +110,8 @@ const Index = () => {
     switch (activeView) {
       case "prediction":
         return (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 h-full">
-            <div className="lg:col-span-4 space-y-2">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-1 h-full">
+            <div className="lg:col-span-4 space-y-1">
               <PredictionForm 
                 onSubmit={handlePrediction} 
                 selectedDuration={selectedDuration}
@@ -119,12 +119,12 @@ const Index = () => {
               />
               
               <Card className="text-xs">
-                <CardHeader className="pb-1 pt-2 px-3">
+                <CardHeader className="pb-1 pt-1 px-2">
                   <CardTitle className="text-xs font-medium">Duration Selection</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-2 p-3 pt-1">
+                <CardContent className="space-y-1 p-2 pt-1">
                   <Select value={durationType} onValueChange={(value: "preset" | "custom") => setDurationType(value)}>
-                    <SelectTrigger className="h-6 text-xs">
+                    <SelectTrigger className="h-5 text-xs">
                       <SelectValue placeholder="Select duration type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -140,11 +140,11 @@ const Index = () => {
                           <Button
                             variant="outline"
                             className={cn(
-                              "w-full justify-start text-left font-normal h-6 text-xs px-2",
+                              "w-full justify-start text-left font-normal h-5 text-xs px-1",
                               !dateRange?.from && "text-muted-foreground"
                             )}
                           >
-                            <CalendarIcon className="mr-1 h-3 w-3" />
+                            <CalendarIcon className="mr-1 h-2 w-2" />
                             {dateRange?.from ? (
                               dateRange.to ? (
                                 <>
@@ -195,9 +195,9 @@ const Index = () => {
             ) : (
               <Card className="h-full flex items-center justify-center">
                 <CardContent className="text-center">
-                  <h3 className="text-base font-medium mb-2">No Analytics Data</h3>
-                  <p className="text-muted-foreground mb-4 text-sm">Generate a prediction first to view analytics</p>
-                  <Button onClick={() => setActiveView("prediction")} className="text-xs h-8">Go to Prediction</Button>
+                  <h3 className="text-sm font-medium mb-1">No Analytics Data</h3>
+                  <p className="text-muted-foreground mb-2 text-xs">Generate a prediction first to view analytics</p>
+                  <Button onClick={() => setActiveView("prediction")} className="text-xs h-6">Go to Prediction</Button>
                 </CardContent>
               </Card>
             )}
@@ -251,7 +251,7 @@ const Index = () => {
                         asChild
                         isActive={activeView === item.id}
                         onClick={() => setActiveView(item.id)}
-                        className="text-xs h-8"
+                        className="text-xs h-6"
                       >
                         <div className="cursor-pointer">
                           <item.icon className="h-3 w-3" />
@@ -267,25 +267,25 @@ const Index = () => {
         </Sidebar>
         
         <div className="flex-1 flex flex-col">
-          {/* Dashboard Header */}
-          <div className="p-2 border-b bg-white shadow-sm flex-shrink-0">
+          {/* Dashboard Header with Blue Background */}
+          <div className="p-1 border-b bg-blue-600 shadow-sm flex-shrink-0">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <SidebarTrigger className="h-6 w-6" />
-                <div className="flex items-center gap-2">
-                  <Zap className="h-5 w-5 text-yellow-500" />
-                  <h1 className="text-lg font-bold text-gray-800">
+              <div className="flex items-center gap-2">
+                <SidebarTrigger className="h-5 w-5 text-white" />
+                <div className="flex items-center gap-1">
+                  <Zap className="h-4 w-4 text-yellow-400" />
+                  <h1 className="text-sm font-bold text-white">
                     Solar Power Prediction Dashboard
                   </h1>
                 </div>
               </div>
-              <div className="text-xs text-gray-500">
+              <div className="text-xs text-blue-100">
                 {sidebarItems.find(item => item.id === activeView)?.title}
               </div>
             </div>
           </div>
           
-          <div className="flex-1 p-2 overflow-hidden">
+          <div className="flex-1 p-1 overflow-hidden">
             {renderContent()}
           </div>
         </div>
