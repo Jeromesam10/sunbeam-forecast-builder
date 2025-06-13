@@ -239,8 +239,8 @@ const Index = () => {
   return (
     <SidebarProvider>
       <div className="h-screen flex flex-col w-full bg-gradient-to-b from-blue-50 to-white">
-        {/* Extended header bar spanning full width */}
-        <div className="p-1 border-b bg-blue-600 shadow-sm flex-shrink-0 w-full">
+        {/* Fixed header bar spanning full width at the top */}
+        <div className="fixed top-0 left-0 right-0 z-30 p-1 border-b bg-blue-600 shadow-sm flex-shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <SidebarTrigger className="h-5 w-5 text-white" />
@@ -257,35 +257,43 @@ const Index = () => {
           </div>
         </div>
         
-        <div className="flex-1 flex overflow-hidden">
-          <Sidebar className="text-xs">
-            <SidebarContent>
-              <SidebarGroup>
-                <SidebarGroupLabel className="text-xs">Solar Dashboard</SidebarGroupLabel>
-                <SidebarGroupContent>
-                  <SidebarMenu>
-                    {sidebarItems.map((item) => (
-                      <SidebarMenuItem key={item.id}>
-                        <SidebarMenuButton 
-                          asChild
-                          isActive={activeView === item.id}
-                          onClick={() => setActiveView(item.id)}
-                          className="text-xs h-6"
-                        >
-                          <div className="cursor-pointer">
-                            <item.icon className="h-3 w-3" />
-                            <span>{item.title}</span>
-                          </div>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    ))}
-                  </SidebarMenu>
-                </SidebarGroupContent>
-              </SidebarGroup>
-            </SidebarContent>
-          </Sidebar>
+        <div className="flex-1 flex overflow-hidden mt-10">
+          {/* Sidebar with hover effect and positioned below header */}
+          <div className="relative group">
+            <Sidebar className="text-xs fixed left-0 top-10 bottom-0 z-20 transition-all duration-300 ease-in-out w-12 group-hover:w-64 bg-white border-r">
+              <SidebarContent className="transition-all duration-300 ease-in-out">
+                <SidebarGroup>
+                  <SidebarGroupLabel className="text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    Solar Dashboard
+                  </SidebarGroupLabel>
+                  <SidebarGroupContent>
+                    <SidebarMenu>
+                      {sidebarItems.map((item) => (
+                        <SidebarMenuItem key={item.id}>
+                          <SidebarMenuButton 
+                            asChild
+                            isActive={activeView === item.id}
+                            onClick={() => setActiveView(item.id)}
+                            className="text-xs h-8 justify-start transition-all duration-300"
+                          >
+                            <div className="cursor-pointer flex items-center gap-2">
+                              <item.icon className="h-4 w-4 flex-shrink-0" />
+                              <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+                                {item.title}
+                              </span>
+                            </div>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      ))}
+                    </SidebarMenu>
+                  </SidebarGroupContent>
+                </SidebarGroup>
+              </SidebarContent>
+            </Sidebar>
+          </div>
           
-          <div className="flex-1 p-1 overflow-hidden">
+          {/* Main content area with proper margin for sidebar */}
+          <div className="flex-1 p-1 overflow-hidden ml-12 transition-all duration-300">
             {renderContent()}
           </div>
         </div>
