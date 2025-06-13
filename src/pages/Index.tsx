@@ -238,52 +238,52 @@ const Index = () => {
 
   return (
     <SidebarProvider>
-      <div className="h-screen flex w-full bg-gradient-to-b from-blue-50 to-white">
-        <Sidebar className="text-xs">
-          <SidebarContent>
-            <SidebarGroup>
-              <SidebarGroupLabel className="text-xs">Solar Dashboard</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {sidebarItems.map((item) => (
-                    <SidebarMenuItem key={item.id}>
-                      <SidebarMenuButton 
-                        asChild
-                        isActive={activeView === item.id}
-                        onClick={() => setActiveView(item.id)}
-                        className="text-xs h-6"
-                      >
-                        <div className="cursor-pointer">
-                          <item.icon className="h-3 w-3" />
-                          <span>{item.title}</span>
-                        </div>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          </SidebarContent>
-        </Sidebar>
-        
-        <div className="flex-1 flex flex-col">
-          {/* Dashboard Header with Blue Background */}
-          <div className="p-1 border-b bg-blue-600 shadow-sm flex-shrink-0">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <SidebarTrigger className="h-5 w-5 text-white" />
-                <div className="flex items-center gap-1">
-                  <Zap className="h-4 w-4 text-yellow-400" />
-                  <h1 className="text-sm font-bold text-white">
-                    Solar Power Prediction Dashboard
-                  </h1>
-                </div>
-              </div>
-              <div className="text-xs text-blue-100">
-                {sidebarItems.find(item => item.id === activeView)?.title}
+      <div className="h-screen flex flex-col w-full bg-gradient-to-b from-blue-50 to-white">
+        {/* Extended header bar spanning full width */}
+        <div className="p-1 border-b bg-blue-600 shadow-sm flex-shrink-0 w-full">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <SidebarTrigger className="h-5 w-5 text-white" />
+              <div className="flex items-center gap-1">
+                <Zap className="h-4 w-4 text-yellow-400" />
+                <h1 className="text-sm font-bold text-white">
+                  Solar Power Prediction Dashboard
+                </h1>
               </div>
             </div>
+            <div className="text-xs text-blue-100">
+              {sidebarItems.find(item => item.id === activeView)?.title}
+            </div>
           </div>
+        </div>
+        
+        <div className="flex-1 flex overflow-hidden">
+          <Sidebar className="text-xs">
+            <SidebarContent>
+              <SidebarGroup>
+                <SidebarGroupLabel className="text-xs">Solar Dashboard</SidebarGroupLabel>
+                <SidebarGroupContent>
+                  <SidebarMenu>
+                    {sidebarItems.map((item) => (
+                      <SidebarMenuItem key={item.id}>
+                        <SidebarMenuButton 
+                          asChild
+                          isActive={activeView === item.id}
+                          onClick={() => setActiveView(item.id)}
+                          className="text-xs h-6"
+                        >
+                          <div className="cursor-pointer">
+                            <item.icon className="h-3 w-3" />
+                            <span>{item.title}</span>
+                          </div>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    ))}
+                  </SidebarMenu>
+                </SidebarGroupContent>
+              </SidebarGroup>
+            </SidebarContent>
+          </Sidebar>
           
           <div className="flex-1 p-1 overflow-hidden">
             {renderContent()}

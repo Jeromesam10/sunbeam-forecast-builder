@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -43,7 +42,6 @@ const ResultsDisplay = ({
     }
   };
 
-  // Prepare data for chart with proper grouping based on duration
   const getChartData = () => {
     if (!results) return [];
     
@@ -126,13 +124,13 @@ const ResultsDisplay = ({
 
   if (!results) {
     return (
-      <Card className="h-full shadow-lg border-blue-100 flex items-center justify-center min-h-[400px]">
-        <CardContent className="text-center p-8">
-          <div className="bg-blue-50 h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-4">
-            <BarChart3 className="h-8 w-8 text-blue-500" />
+      <Card className="h-full shadow-lg border-blue-100 flex items-center justify-center min-h-[200px]">
+        <CardContent className="text-center p-4">
+          <div className="bg-blue-50 h-12 w-12 rounded-full flex items-center justify-center mx-auto mb-2">
+            <BarChart3 className="h-6 w-6 text-blue-500" />
           </div>
-          <h3 className="text-xl font-medium text-gray-700 mb-2">No Prediction Generated</h3>
-          <p className="text-gray-500">
+          <h3 className="text-sm font-medium text-gray-700 mb-1">No Prediction Generated</h3>
+          <p className="text-gray-500 text-xs">
             Fill out the form with your solar panel details to generate a power prediction
           </p>
         </CardContent>
@@ -142,22 +140,22 @@ const ResultsDisplay = ({
 
   if (showKPIs) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-2">
         <div className="flex justify-between items-center">
           <Button 
             variant="outline" 
             onClick={onBackToChart}
-            className="flex items-center"
+            className="flex items-center text-xs h-6"
           >
-            <BarChart3 className="h-4 w-4 mr-2" />
+            <BarChart3 className="h-3 w-3 mr-1" />
             Back to Charts
           </Button>
           <Button 
             onClick={onNavigateToMetrics}
-            className="flex items-center"
+            className="flex items-center text-xs h-6"
           >
             Advanced Metrics
-            <ArrowRight className="h-4 w-4 ml-2" />
+            <ArrowRight className="h-3 w-3 ml-1" />
           </Button>
         </div>
         <KPIDisplay results={results} />
@@ -167,70 +165,79 @@ const ResultsDisplay = ({
 
   return (
     <Card className="shadow-lg border-blue-100">
-      <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100/50 rounded-t-lg">
+      <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100/50 rounded-t-lg pb-1 pt-1 px-2">
         <div className="flex justify-between items-start">
           <div>
-            <CardTitle>Solar Power Prediction Results</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-sm">Solar Power Prediction Results</CardTitle>
+            <CardDescription className="text-xs">
               Estimated power generation for {results.duration}
             </CardDescription>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-1">
             <Button 
               onClick={onShowKPIs}
               variant="outline"
-              className="flex items-center"
+              className="flex items-center text-xs h-6 px-2"
             >
-              <TrendingUp className="h-4 w-4 mr-2" />
-              Show Important KPIs
+              <TrendingUp className="h-3 w-3 mr-1" />
+              Show KPIs
             </Button>
             <Button 
               onClick={onNavigateToMetrics}
-              className="flex items-center"
+              className="flex items-center text-xs h-6 px-2"
             >
-              Advanced Metrics
-              <ArrowRight className="h-4 w-4 ml-2" />
+              Metrics
+              <ArrowRight className="h-3 w-3 ml-1" />
             </Button>
           </div>
         </div>
       </CardHeader>
-      <CardContent className="pt-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <div className="bg-blue-50 p-4 rounded-lg">
-            <div className="text-sm text-blue-700 font-medium mb-1">{results.duration} Power Generation</div>
-            <div className="text-3xl font-bold text-blue-900">{results.totalOutput} kWh</div>
+      <CardContent className="pt-2 px-2 pb-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
+          <div className="bg-blue-50 p-2 rounded-lg">
+            <div className="text-xs text-blue-700 font-medium mb-0.5">{results.duration} Power Generation</div>
+            <div className="text-lg font-bold text-blue-900">{results.totalOutput} kWh</div>
           </div>
-          <div className="bg-yellow-50 p-4 rounded-lg">
-            <div className="text-sm text-yellow-700 font-medium mb-1">System Efficiency</div>
-            <div className="text-3xl font-bold text-yellow-900">{results.efficiency}%</div>
+          <div className="bg-yellow-50 p-2 rounded-lg">
+            <div className="text-xs text-yellow-700 font-medium mb-0.5">System Efficiency</div>
+            <div className="text-lg font-bold text-yellow-900">{results.efficiency}%</div>
             <PercentageIndicator percentage={results.efficiency} />
           </div>
         </div>
         
-        {/* Always show chart by default */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold flex items-center">
-            <BarChart3 className="h-5 w-5 mr-2 text-blue-600" />
+        {/* Reduced chart height */}
+        <div className="space-y-2">
+          <h3 className="text-sm font-semibold flex items-center">
+            <BarChart3 className="h-4 w-4 mr-1 text-blue-600" />
             Power Output Chart
           </h3>
-          <div className="h-[300px]">
+          <div className="h-[150px]">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData} margin={{ top: 5, right: 5, left: 0, bottom: 25 }}>
+              <BarChart data={chartData} margin={{ top: 5, right: 5, left: 0, bottom: 15 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="day" />
+                <XAxis 
+                  dataKey="day" 
+                  tick={{ fontSize: 10 }}
+                  height={30}
+                />
                 <YAxis 
                   label={{ 
                     value: 'kWh', 
                     angle: -90, 
                     position: 'insideLeft',
-                    style: { textAnchor: 'middle' } 
-                  }} 
+                    style: { textAnchor: 'middle', fontSize: 10 } 
+                  }}
+                  tick={{ fontSize: 10 }}
+                  width={30}
                 />
-                <Tooltip formatter={(value) => [`${value} kWh`, 'Power Output']} />
+                <Tooltip 
+                  formatter={(value) => [`${value} kWh`, 'Power Output']}
+                  contentStyle={{ fontSize: '10px' }}
+                />
                 <Bar 
                   dataKey="output" 
                   fill="#3B82F6" 
-                  radius={[4, 4, 0, 0]}
+                  radius={[2, 2, 0, 0]}
                   name="Power Output" 
                 />
               </BarChart>
@@ -239,24 +246,24 @@ const ResultsDisplay = ({
         </div>
 
         {results.duration === "1 week" && (
-          <Tabs defaultValue="daily" className="mt-6">
-            <TabsList className="grid grid-cols-1 w-full">
-              <TabsTrigger value="daily">Daily Breakdown</TabsTrigger>
+          <Tabs defaultValue="daily" className="mt-2">
+            <TabsList className="grid grid-cols-1 w-full h-6">
+              <TabsTrigger value="daily" className="text-xs py-0">Daily Breakdown</TabsTrigger>
             </TabsList>
             
-            <TabsContent value="daily" className="border-none p-0 mt-4">
-              <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
+            <TabsContent value="daily" className="border-none p-0 mt-2">
+              <div className="space-y-1 max-h-[120px] overflow-y-auto pr-1">
                 {results.dailyOutput.map((output, index) => (
                   <div 
                     key={index} 
-                    className="flex items-center justify-between p-3 bg-white border border-blue-100 rounded-lg shadow-sm"
+                    className="flex items-center justify-between p-1.5 bg-white border border-blue-100 rounded-lg shadow-sm"
                   >
                     <div className="flex items-center">
                       {getWeatherIcon(results.weatherConditions[index])}
-                      <span className="ml-2 font-medium">Day {index + 1}</span>
-                      <span className="ml-4 text-sm text-gray-500">{results.weatherConditions[index]}</span>
+                      <span className="ml-1 font-medium text-xs">Day {index + 1}</span>
+                      <span className="ml-2 text-xs text-gray-500">{results.weatherConditions[index]}</span>
                     </div>
-                    <div className="font-bold text-blue-600">{output} kWh</div>
+                    <div className="font-bold text-blue-600 text-xs">{output} kWh</div>
                   </div>
                 ))}
               </div>
