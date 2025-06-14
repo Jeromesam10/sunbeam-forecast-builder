@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -47,13 +48,14 @@ const ResultsDisplay = ({
     
     const { dailyOutput, weatherConditions, duration } = results;
     
-    if (duration === "1 week") {
+    // Handle both "last 1 week" and "1 week" formats
+    if (duration.includes("1 week") || duration.includes("week")) {
       return dailyOutput.map((output, index) => ({
         day: `Day ${index + 1}`,
         output,
         weather: weatherConditions[index]
       }));
-    } else if (duration === "3 months") {
+    } else if (duration.includes("3 months") || duration.includes("month")) {
       // Group by weeks (13 weeks)
       const weeklyData = [];
       for (let i = 0; i < 13; i++) {
@@ -67,7 +69,7 @@ const ResultsDisplay = ({
         });
       }
       return weeklyData;
-    } else if (duration === "6 months") {
+    } else if (duration.includes("6 months")) {
       // Group by months (6 months)
       const monthlyData = [];
       const daysPerMonth = 30;
@@ -82,7 +84,7 @@ const ResultsDisplay = ({
         });
       }
       return monthlyData;
-    } else if (duration === "1 year") {
+    } else if (duration.includes("1 year") || duration.includes("year")) {
       // Group by months (12 months)
       const monthlyData = [];
       const daysPerMonth = Math.floor(365 / 12);
@@ -97,6 +99,13 @@ const ResultsDisplay = ({
         });
       }
       return monthlyData;
+    } else if (duration.includes("days")) {
+      // Handle custom date ranges
+      return dailyOutput.map((output, index) => ({
+        day: `Day ${index + 1}`,
+        output,
+        weather: weatherConditions[index] || "Mixed"
+      }));
     }
     
     return [];
@@ -245,7 +254,7 @@ const ResultsDisplay = ({
           </div>
         </div>
 
-        {results.duration === "1 week" && (
+        {(results.duration.includes("1 week") || results.duration.includes("week")) && (
           <Tabs defaultValue="daily" className="mt-2">
             <TabsList className="grid grid-cols-1 w-full h-6">
               <TabsTrigger value="daily" className="text-xs py-0">Daily Breakdown</TabsTrigger>

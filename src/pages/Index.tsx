@@ -100,6 +100,11 @@ const Index = () => {
     
     setResults(newResults);
     setShowKPIs(false);
+    
+    // Only switch to prediction view if user is not already there
+    if (activeView !== "prediction") {
+      setActiveView("prediction");
+    }
   };
 
   const renderContent = () => {
