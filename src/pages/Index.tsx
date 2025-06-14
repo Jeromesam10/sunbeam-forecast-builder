@@ -46,6 +46,12 @@ const Index = () => {
     { title: "Settings", id: "settings", icon: Settings },
   ];
 
+  // Simple seeded random function to ensure consistent results
+  const seededRandom = (seed: number) => {
+    let x = Math.sin(seed) * 10000;
+    return x - Math.floor(x);
+  };
+
   const handlePrediction = (formData: {
     location: string;
     capacity: number;
@@ -57,6 +63,9 @@ const Index = () => {
     // Use the duration from the form data
     const finalDuration = formData.duration;
 
+    // Create a seed based on form parameters for consistent results
+    const seed = formData.location.length + formData.capacity + formData.angle + formData.direction.length;
+
     // Generate data based on duration
     const getDurationData = (duration: string) => {
       let numDays = 7; // default
@@ -65,9 +74,10 @@ const Index = () => {
       else if (duration.includes("1 year")) numDays = 365;
       else if (duration.includes("days")) numDays = parseInt(duration);
 
-      return Array.from({ length: numDays }, () => {
+      return Array.from({ length: numDays }, (_, index) => {
         const weatherTypes = ["Sunny", "Partly Cloudy", "Cloudy"];
-        const randomWeather = weatherTypes[Math.floor(Math.random() * weatherTypes.length)];
+        const randomValue = seededRandom(seed + index);
+        const randomWeather = weatherTypes[Math.floor(randomValue * weatherTypes.length)];
         const weatherMultiplier = randomWeather === "Sunny" ? 1 : 
                                 randomWeather === "Partly Cloudy" ? 0.7 : 0.4;
         const efficiencyFactor = 0.7 + (formData.angle / 100) * 0.3;
@@ -99,7 +109,7 @@ const Index = () => {
     };
     
     setResults(newResults);
-    setShowKPIs(false);
+    // Don't change showKPIs state - keep user on current tab
     
     // Only switch to prediction view if user is not already there
     if (activeView !== "prediction") {
