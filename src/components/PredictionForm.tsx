@@ -1,4 +1,5 @@
 
+
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,8 @@ interface PredictionFormProps {
     capacity: number;
     angle: number;
     direction: string;
+    duration: string;
+    durationType: "preset" | "custom";
   }) => void;
   selectedDuration: string;
   onDurationChange: (duration: string) => void;
@@ -30,6 +33,7 @@ const PredictionForm = ({ onSubmit, selectedDuration, onDurationChange }: Predic
   const [direction, setDirection] = useState("South");
   const [durationType, setDurationType] = useState<"preset" | "custom">("preset");
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,7 +43,6 @@ const PredictionForm = ({ onSubmit, selectedDuration, onDurationChange }: Predic
     if (durationType === "custom" && dateRange?.from && dateRange?.to) {
       const days = differenceInDays(dateRange.to, dateRange.from);
       finalDuration = `${days} days`;
-      onDurationChange(finalDuration);
     }
     
     onSubmit({
@@ -47,6 +50,8 @@ const PredictionForm = ({ onSubmit, selectedDuration, onDurationChange }: Predic
       capacity,
       angle,
       direction,
+      duration: finalDuration,
+      durationType,
     });
   };
 
@@ -62,6 +67,8 @@ const PredictionForm = ({ onSubmit, selectedDuration, onDurationChange }: Predic
     if (range?.from && range?.to) {
       const days = differenceInDays(range.to, range.from);
       onDurationChange(`${days} days`);
+      // Auto-close calendar when both dates are selected
+      setIsCalendarOpen(false);
     }
   };
 
@@ -102,17 +109,17 @@ const PredictionForm = ({ onSubmit, selectedDuration, onDurationChange }: Predic
                 <SelectValue placeholder="Select duration" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="1 week">Last 1 Week</SelectItem>
-                <SelectItem value="3 months">Last 3 Months</SelectItem>
-                <SelectItem value="6 months">Last 6 Months</SelectItem>
-                <SelectItem value="1 year">Last 1 Year</SelectItem>
+                <SelectItem value="last 1 week">Last 1 Week</SelectItem>
+                <SelectItem value="last 3 months">Last 3 Months</SelectItem>
+                <SelectItem value="last 6 months">Last 6 Months</SelectItem>
+                <SelectItem value="last 1 year">Last 1 Year</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className={cn("space-y-0.5", durationType !== "custom" && "opacity-50 pointer-events-none")}>
             <Label className="text-xs font-medium">Custom Date Range</Label>
-            <Popover>
+            <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"

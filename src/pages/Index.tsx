@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
@@ -52,9 +51,11 @@ const Index = () => {
     capacity: number;
     angle: number;
     direction: string;
+    duration: string;
+    durationType: "preset" | "custom";
   }) => {
-    // Calculate duration based on selection
-    let finalDuration = selectedDuration;
+    // Use the duration from the form data
+    const finalDuration = formData.duration;
 
     // Generate data based on duration
     const getDurationData = (duration: string) => {
