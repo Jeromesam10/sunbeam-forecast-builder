@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
@@ -35,8 +36,8 @@ const Index = () => {
     duration: string;
   }>(null);
   const [showKPIs, setShowKPIs] = useState(false);
-  const [selectedDuration, setSelectedDuration] = useState("1 week");
-  const [activeView, setActiveView] = useState("prediction");
+  const [selectedDuration, setSelectedDuration] = useState("last 1 week");
+  const [activeView, setActiveView] = useState("map");
 
   const sidebarItems = [
     { title: "Project Map", id: "map", icon: MapPin },
@@ -54,10 +55,6 @@ const Index = () => {
   }) => {
     // Calculate duration based on selection
     let finalDuration = selectedDuration;
-    if (durationType === "custom" && dateRange?.from && dateRange?.to) {
-      const days = differenceInDays(dateRange.to, dateRange.from);
-      finalDuration = `${days} days`;
-    }
 
     // Generate data based on duration
     const getDurationData = (duration: string) => {
