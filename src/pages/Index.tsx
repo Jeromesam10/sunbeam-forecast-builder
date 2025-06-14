@@ -41,9 +41,9 @@ const Index = () => {
   const [durationType, setDurationType] = useState<"preset" | "custom">("preset");
 
   const sidebarItems = [
+    { title: "Project Map", id: "map", icon: MapPin },
     { title: "Prediction", id: "prediction", icon: Home },
     { title: "Analytics", id: "analytics", icon: BarChart3 },
-    { title: "Project Map", id: "map", icon: MapPin },
     { title: "Live Monitoring", id: "monitoring", icon: Activity },
     { title: "Settings", id: "settings", icon: Settings },
   ];

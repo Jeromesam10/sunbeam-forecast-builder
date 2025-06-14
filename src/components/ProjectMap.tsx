@@ -17,6 +17,7 @@ const ProjectMap = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   // Real project data with actual coordinates
   const projects = [
@@ -79,6 +80,33 @@ const ProjectMap = () => {
     }
   };
 
+  // Auto-scroll to selected project in the list
+  const scrollToProject = (projectId: string) => {
+    if (scrollAreaRef.current) {
+      const projectElement = document.querySelector(`[data-project-id="${projectId}"]`);
+      if (projectElement) {
+        projectElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  };
+
+  const handleProjectSelect = (projectId: string) => {
+    setSelectedProject(projectId);
+    
+    // Zoom to project on map
+    if (map.current) {
+      const project = projects.find(p => p.id === projectId);
+      if (project) {
+        map.current.setView([project.coordinates.lat, project.coordinates.lng], 10);
+      }
+    }
+  };
+
+  const handleMapMarkerClick = (projectId: string) => {
+    setSelectedProject(projectId);
+    scrollToProject(projectId);
+  };
+
   const initializeMap = () => {
     if (!mapContainer.current || map.current) return;
 
@@ -130,7 +158,7 @@ const ProjectMap = () => {
 
         // Add click event to marker
         marker.on('click', () => {
-          setSelectedProject(project.id);
+          handleMapMarkerClick(project.id);
         });
 
         markersRef.current.push(marker);
@@ -166,17 +194,18 @@ const ProjectMap = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ScrollArea className="h-64">
+            <ScrollArea className="h-64" ref={scrollAreaRef}>
               <div className="space-y-2 pr-4">
                 {projects.map((project) => (
                   <div
                     key={project.id}
+                    data-project-id={project.id}
                     className={`p-2 rounded-lg border cursor-pointer transition-colors ${
                       selectedProject === project.id
                         ? "border-blue-500 bg-blue-50"
                         : "border-gray-200 hover:border-gray-300"
                     }`}
-                    onClick={() => setSelectedProject(project.id)}
+                    onClick={() => handleProjectSelect(project.id)}
                   >
                     <div className="flex items-start justify-between mb-1">
                       <h4 className="font-medium text-xs">{project.name}</h4>
