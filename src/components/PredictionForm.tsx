@@ -5,7 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MapPin, Zap } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { MapPin, Zap, CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { format, differenceInDays } from "date-fns";
+import { DateRange } from "react-day-picker";
 
 interface PredictionFormProps {
   onSubmit: (data: {
@@ -23,15 +28,41 @@ const PredictionForm = ({ onSubmit, selectedDuration, onDurationChange }: Predic
   const [capacity, setCapacity] = useState(5);
   const [angle, setAngle] = useState(30);
   const [direction, setDirection] = useState("South");
+  const [durationType, setDurationType] = useState<"preset" | "custom">("preset");
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Calculate final duration based on selection type
+    let finalDuration = selectedDuration;
+    if (durationType === "custom" && dateRange?.from && dateRange?.to) {
+      const days = differenceInDays(dateRange.to, dateRange.from);
+      finalDuration = `${days} days`;
+      onDurationChange(finalDuration);
+    }
+    
     onSubmit({
       location,
       capacity,
       angle,
       direction,
     });
+  };
+
+  const handleDurationTypeChange = (type: "preset" | "custom") => {
+    setDurationType(type);
+    if (type === "preset") {
+      setDateRange(undefined);
+    }
+  };
+
+  const handleCustomDateChange = (range: DateRange | undefined) => {
+    setDateRange(range);
+    if (range?.from && range?.to) {
+      const days = differenceInDays(range.to, range.from);
+      onDurationChange(`${days} days`);
+    }
   };
 
   return (
@@ -48,18 +79,74 @@ const PredictionForm = ({ onSubmit, selectedDuration, onDurationChange }: Predic
       <CardContent className="pt-1 space-y-1 p-2">
         <form onSubmit={handleSubmit} className="space-y-1">
           <div className="space-y-0.5">
+            <Label htmlFor="durationType" className="text-xs font-medium">Duration Selection Method</Label>
+            <Select value={durationType} onValueChange={handleDurationTypeChange}>
+              <SelectTrigger className="h-5 text-xs">
+                <SelectValue placeholder="Select duration type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="preset">Preset Duration</SelectItem>
+                <SelectItem value="custom">Custom Date Range</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className={cn("space-y-0.5", durationType !== "preset" && "opacity-50 pointer-events-none")}>
             <Label htmlFor="duration" className="text-xs font-medium">Prediction Duration</Label>
-            <Select value={selectedDuration} onValueChange={onDurationChange}>
+            <Select 
+              value={selectedDuration} 
+              onValueChange={onDurationChange}
+              disabled={durationType !== "preset"}
+            >
               <SelectTrigger className="h-5 text-xs">
                 <SelectValue placeholder="Select duration" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="1 week">1 Week</SelectItem>
-                <SelectItem value="3 months">3 Months</SelectItem>
-                <SelectItem value="6 months">6 Months</SelectItem>
-                <SelectItem value="1 year">1 Year</SelectItem>
+                <SelectItem value="1 week">Last 1 Week</SelectItem>
+                <SelectItem value="3 months">Last 3 Months</SelectItem>
+                <SelectItem value="6 months">Last 6 Months</SelectItem>
+                <SelectItem value="1 year">Last 1 Year</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+
+          <div className={cn("space-y-0.5", durationType !== "custom" && "opacity-50 pointer-events-none")}>
+            <Label className="text-xs font-medium">Custom Date Range</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  disabled={durationType !== "custom"}
+                  className={cn(
+                    "w-full justify-start text-left font-normal h-5 text-xs px-1",
+                    !dateRange?.from && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-1 h-2 w-2" />
+                  {dateRange?.from ? (
+                    dateRange.to ? (
+                      <>
+                        {format(dateRange.from, "MMM dd")} -{" "}
+                        {format(dateRange.to, "MMM dd")}
+                      </>
+                    ) : (
+                      format(dateRange.from, "MMM dd, y")
+                    )
+                  ) : (
+                    <span>Pick date range</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="range"
+                  selected={dateRange}
+                  onSelect={handleCustomDateChange}
+                  numberOfMonths={2}
+                  className="pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
           </div>
 
           <div className="space-y-0.5">

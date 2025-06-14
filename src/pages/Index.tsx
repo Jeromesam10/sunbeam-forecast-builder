@@ -37,8 +37,6 @@ const Index = () => {
   const [showKPIs, setShowKPIs] = useState(false);
   const [selectedDuration, setSelectedDuration] = useState("1 week");
   const [activeView, setActiveView] = useState("prediction");
-  const [dateRange, setDateRange] = useState<DateRange | undefined>();
-  const [durationType, setDurationType] = useState<"preset" | "custom">("preset");
 
   const sidebarItems = [
     { title: "Project Map", id: "map", icon: MapPin },
@@ -117,62 +115,6 @@ const Index = () => {
                 selectedDuration={selectedDuration}
                 onDurationChange={setSelectedDuration}
               />
-              
-              <Card className="text-xs">
-                <CardHeader className="pb-1 pt-1 px-2">
-                  <CardTitle className="text-xs font-medium">Duration Selection</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-1 p-2 pt-1">
-                  <Select value={durationType} onValueChange={(value: "preset" | "custom") => setDurationType(value)}>
-                    <SelectTrigger className="h-5 text-xs">
-                      <SelectValue placeholder="Select duration type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="preset">Preset Duration</SelectItem>
-                      <SelectItem value="custom">Custom Date Range</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  
-                  {durationType === "custom" && (
-                    <div className="space-y-1">
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className={cn(
-                              "w-full justify-start text-left font-normal h-5 text-xs px-1",
-                              !dateRange?.from && "text-muted-foreground"
-                            )}
-                          >
-                            <CalendarIcon className="mr-1 h-2 w-2" />
-                            {dateRange?.from ? (
-                              dateRange.to ? (
-                                <>
-                                  {format(dateRange.from, "MMM dd")} -{" "}
-                                  {format(dateRange.to, "MMM dd")}
-                                </>
-                              ) : (
-                                format(dateRange.from, "MMM dd, y")
-                              )
-                            ) : (
-                              <span>Pick date range</span>
-                            )}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="range"
-                            selected={dateRange}
-                            onSelect={setDateRange}
-                            numberOfMonths={2}
-                            className="pointer-events-auto"
-                          />
-                        </PopoverContent>
-                      </Popover>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
             </div>
             
             <div className="lg:col-span-8 h-full">
