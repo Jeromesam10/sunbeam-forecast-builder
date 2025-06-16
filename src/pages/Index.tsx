@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
@@ -5,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CalendarIcon, MapPin, BarChart3, Activity, Settings, Home, Zap } from "lucide-react";
+import { CalendarIcon, MapPin, BarChart3, Activity, Settings, Home, Zap, LogOut, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format, differenceInDays } from "date-fns";
 import { DateRange } from "react-day-picker";
@@ -13,6 +14,7 @@ import PredictionForm from "@/components/PredictionForm";
 import ResultsDisplay from "@/components/ResultsDisplay";
 import KPIDisplay from "@/components/KPIDisplay";
 import ProjectMap from "@/components/ProjectMap";
+import { useAuth } from "@/hooks/useAuth";
 import {
   Sidebar,
   SidebarContent,
@@ -27,6 +29,7 @@ import {
 } from "@/components/ui/sidebar";
 
 const Index = () => {
+  const { user, logout } = useAuth();
   const [results, setResults] = useState<null | {
     dailyOutput: number[];
     totalOutput: number;
@@ -206,8 +209,23 @@ const Index = () => {
                 </h1>
               </div>
             </div>
-            <div className="text-xs text-blue-100">
-              {sidebarItems.find(item => item.id === activeView)?.title}
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 text-blue-100">
+                <User className="h-4 w-4" />
+                <span className="text-xs">Welcome, {user}</span>
+              </div>
+              <div className="text-xs text-blue-100">
+                {sidebarItems.find(item => item.id === activeView)?.title}
+              </div>
+              <Button
+                onClick={logout}
+                variant="ghost"
+                size="sm"
+                className="text-white hover:bg-blue-700 h-6 px-2"
+              >
+                <LogOut className="h-3 w-3 mr-1" />
+                <span className="text-xs">Logout</span>
+              </Button>
             </div>
           </div>
         </div>
