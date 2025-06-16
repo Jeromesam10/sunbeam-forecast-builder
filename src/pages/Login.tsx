@@ -17,11 +17,11 @@ const Login = () => {
     e.preventDefault();
     setError("");
 
-    // Simple authentication check (in real app, this would be handled by Supabase)
-    if (username.trim() && password.trim()) {
+    // Check for specific admin credentials
+    if (username === "admin" && password === "admin") {
       login(username);
     } else {
-      setError("Please enter both username and password");
+      setError("Incorrect username or password");
     }
   };
 
@@ -71,7 +71,7 @@ const Login = () => {
             </Button>
           </form>
           <div className="mt-4 text-center text-sm text-muted-foreground">
-            Demo: Enter any username and password to access the dashboard
+            Use username: admin and password: admin to access the dashboard
           </div>
         </CardContent>
       </Card>
